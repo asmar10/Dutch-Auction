@@ -53,4 +53,21 @@ contract dutchAuction {
         selfdestruct(seller);
     }
 
+     function buyAfterAuction() public payable{
+        require(stopTime<block.timestamp,"Auction finished");
+        uint temp = getPrice();
+
+        if(temp>msg.value){
+            revert invalidBid();
+        }
+        uint refund = msg.value - temp;
+
+        if (refund > 0) {
+            payable(msg.sender).transfer(refund);
+        }
+        nftContract.transferFrom(seller, msg.sender, nftId);
+        seller.transfer(address(this).balance);
+        selfdestruct(seller);
+    }
+
 }
